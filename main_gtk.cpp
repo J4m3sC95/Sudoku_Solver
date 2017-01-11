@@ -13,6 +13,8 @@ extern "C" {
 
 char filename[100];
 
+unsigned char possibility_matrix[10][82];
+
 // get icon for gdk window
 GdkPixbuf *create_pixbuf(const gchar *filename){
 	GdkPixbuf *pixbuf;
@@ -48,11 +50,7 @@ void solve_button_press(GtkWidget *widget, gpointer window){
 		}
 	}
 	
-	for(n=0; n<81; n++){
-		sudoku_output[n] = sudoku_input[n];
-	}
-	
-	sudoku_solve(sudoku_output);
+	sudoku_solve(sudoku_input, sudoku_output, possibility_matrix);
 	for(n = 0; n<81; n++){
 		//char fill;
 		if(sudoku_output[n] != 0){

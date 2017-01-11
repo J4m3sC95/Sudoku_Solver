@@ -16,6 +16,9 @@ sudoku_gtk: sudoku.o main_gtk.cpp
 sudoku_cmd: sudoku.o main_cmd.cpp
 	$(CC) -o $@ sudoku.o main_cmd.cpp $(CFLAGS)
 
+sudoku_tande: sudoku.o sudoku_tande.cpp
+	$(CC) -o $@ sudoku.o sudoku_tande.cpp $(CFLAGS)
+
 sudoku.o: sudoku.h sudoku.cpp
 	$(CC) -c -o sudoku.o sudoku.cpp $(CFLAGS)
 
