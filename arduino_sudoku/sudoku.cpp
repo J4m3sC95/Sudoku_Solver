@@ -4,82 +4,15 @@
 
 #include "sudoku.h"
 
-// easy sudoku from 1st march metro
-unsigned char metro_sudoku_easy[82] = {
-	5,0,7,	0,8,1,	0,0,0,
-	0,1,0,	0,0,6,	7,0,5,
-	0,2,0,	7,0,4,	0,3,0,
+unsigned int old_poss_count, new_poss_count;
 
-	0,0,5,	0,2,0,	0,0,9,
-	8,0,2,	0,0,0,	1,0,7,
-	1,0,0,	5,9,0,	6,0,0,
+// if compiling for arduino
+#ifdef ARDUINO
+// buffer to store printf data in for macro to avoid rewriting all printfs to serial prints
+char buffer[100];
+#define printf(fmt,...) sprintf(buffer, fmt, ##__VA_ARGS__); Serial.print(buffer);
+#endif
 
-	0,6,0,	8,0,5,	0,4,0,
-	2,8,1,	3,0,0,	0,7,6,
-	0,0,0,	0,7,0,	9,0,8
-};
-
-// moderate sudoku from 1st march metro
-unsigned char metro_sudoku_moderate[82] = {
-	5,8,0,	0,0,4,	0,9,0,
-	0,0,6,	0,9,0,	0,0,0,
-	0,0,9,	0,0,1,	0,0,4,
-
-	0,6,4,	0,5,0,	8,3,0,
-	7,0,0,	8,0,3,	0,0,1,
-	0,9,8,	0,4,0,	6,0,0,
-
-	6,0,0,	3,0,0,	7,0,9,
-	0,0,0,	0,1,0,	3,0,0,
-	0,1,0,	9,0,0,	0,5,2
-};
-
-// challenging sudoku from 1st march metro
-unsigned char metro_sudoku_challenging[82] = {
-	0,0,0,	0,0,0,	0,1,0,
-	4,0,0,	0,3,0,	9,0,0,
-	0,7,0,	9,0,2,	6,0,0,
-
-	2,5,0,	0,0,6,	0,0,3,
-	0,9,0,	0,0,0,	0,7,0,
-	6,0,0,	5,0,0,	0,9,1,
-
-	0,0,8,	3,0,4,	0,5,0,
-	0,0,3,	0,5,0,	0,0,9,
-	0,4,0,	0,0,0,	0,0,0
-};
-
-// challenging sudoku from 21st April metro
-unsigned char metro_sudoku_challenging_2[82] = {
-	0,0,0,	0,2,0,	0,0,0,
-	0,0,9,	6,0,4,	2,0,0,
-	5,0,0,	3,0,8,	0,0,6,
-	
-	0,9,8,	0,0,0,	7,1,0,
-	0,3,0,	0,0,0,	0,9,0,
-	0,7,1,	0,0,0,	6,3,0,
-	
-	8,0,0,	2,0,5,	0,0,7,
-	0,0,7,	1,0,6,	4,0,0,
-	0,0,0,	0,3,0,	0,0,0,
-};
-
-// sudoku from the courier 29th feb
-unsigned char courier_sudoku[82] = {
-	
-	0,2,0,	0,0,8,	0,0,0,
-	0,0,7,	0,0,2,	3,0,1,
-	0,0,5,	1,0,0,	0,0,0,
-
-	0,9,0,	0,0,0,	0,8,7,
-	8,0,2,	0,1,0,	0,0,3,
-	4,7,0,	0,0,0,	0,2,0,
-
-	0,0,0,	0,0,3,	7,0,0,
-	7,0,6,	4,0,0,	9,0,0,
-	0,0,0,	6,0,0,	0,4,0
-};
- 
 // function which determines if a number is in a 9 element array (row/col/square)
 // 0 = not there, if present, a count will be returned
 unsigned char is_num(unsigned char data[10], unsigned char num) {
@@ -644,19 +577,31 @@ void sudoku_verify(unsigned char sudoku[82]) {
 		// check rows
 		for (n = 0; n < 9; n++) {
 			if (is_num(extract_row(n, sudoku), num) > 1) {
+        #ifdef ARDUINO_AVR_UNO
+        printf("Error!!");
+        #else
 				printf("\nError!! - More than one %d in row %d\n", num, n);
+        #endif
 			}
 		}
 		// check columns
 		for (n = 0; n < 9; n++) {
 			if (is_num(extract_col(n, sudoku), num) > 1) {
+        #ifdef ARDUINO_AVR_UNO
+				printf("Error!!");
+        #else
 				printf("\nError!! - More than one %d in col %d\n", num, n);
+        #endif
 			}
 		}
 		// check sqaures
 		for (n = 0; n < 9; n++) {
 			if (is_num(extract_square(n, sudoku), num) > 1) {
+        #ifdef ARDUINO_AVR_UNO
+				printf("Error!!");
+        #else
 				printf("\nError!! - More than one %d in square %d\n", num, n);
+        #endif
 			}
 		}
 	}

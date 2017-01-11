@@ -12,6 +12,7 @@
 //if compiling for arduino
 #ifdef ARDUINO
 #include <Arduino.h>
+#endif
 
 // easy sudoku from 1st march metro
 static unsigned char metro_sudoku_easy[82] = {
@@ -88,23 +89,6 @@ static unsigned char courier_sudoku[82] = {
   7,0,6,  4,0,0,  9,0,0,
   0,0,0,  6,0,0,  0,4,0
 };
-
-// if not compiling for arduino
-#else
-
-unsigned int old_poss_count, new_poss_count;
-
-unsigned char master_possibilities[10][82];
-
-
-// sudokus
-unsigned char metro_sudoku_easy[82];
-unsigned char metro_sudoku_moderate[82];
-unsigned char metro_sudoku_challenging[82];
-unsigned char metro_sudoku_challenging_2[82];
-unsigned char courier_sudoku[82];
-
-#endif
 
 /***** FUNCTION PROTOTYPES ******/
 unsigned char is_num(unsigned char data[10], unsigned char num);

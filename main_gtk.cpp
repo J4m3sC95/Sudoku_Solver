@@ -2,9 +2,13 @@
 * Sudoku main for gtk interface
 */
 
+extern "C" {
+	
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include <string.h>
+}
+
 #include "sudoku.h"
 
 char filename[100];
@@ -56,7 +60,7 @@ void solve_button_press(GtkWidget *widget, gpointer window){
 			gtk_entry_set_text(GTK_ENTRY(output[n]), &fill);
 		}
 		else{
-			char fill = NULL;
+			char fill = '\0';
 			gtk_entry_set_text(GTK_ENTRY(output[n]), &fill);
 		}
 	}
@@ -65,7 +69,7 @@ void solve_button_press(GtkWidget *widget, gpointer window){
 // function that runs when the clear button is pressed
 void clear_start_button_press(GtkWidget *widget, gpointer window){
 	unsigned char n;
-	char fill = NULL;
+	char fill = '\0';
 	for(n = 0; n<81; n++){
 		gtk_entry_set_text(GTK_ENTRY(entry[n]), &fill);
 	}
@@ -74,7 +78,7 @@ void clear_start_button_press(GtkWidget *widget, gpointer window){
 // function that runs when the clear button is pressed
 void clear_solution_button_press(GtkWidget *widget, gpointer window){
 	unsigned char n;
-	char fill = NULL;
+	char fill = '\0';
 	for(n = 0; n<81; n++){
 		gtk_entry_set_text(GTK_ENTRY(output[n]), &fill);
 	}
@@ -118,7 +122,7 @@ void read_from_file(GtkWidget *widget, gpointer window){
 		return;
 	}
 	char n = 0;
-	char fill = NULL;
+	char fill = '\0';
 	unsigned char index = 0;
 	while(!feof(data_file)){
 		fread(&n, 1, 1, data_file);
@@ -184,11 +188,11 @@ int main( int argc, char *argv[] ){
     for(n=0; n<9; n++){
 		// entry
 		entry_square_frame[n] = gtk_frame_new(NULL);
-		gtk_frame_set_shadow_type(GTK_FRAME(entry_square_frame[n]), GTK_SHADOW_OUT);
+		gtk_frame_set_shadow_type(GTK_FRAME(entry_square_frame[n]), (GtkShadowType) GTK_SHADOW_OUT);
 		entry_squares[n] = gtk_table_new(3,3,FALSE);
 		// output
 		output_square_frame[n] = gtk_frame_new(NULL);
-		gtk_frame_set_shadow_type(GTK_FRAME(output_square_frame[n]), GTK_SHADOW_OUT);
+		gtk_frame_set_shadow_type(GTK_FRAME(output_square_frame[n]), (GtkShadowType) GTK_SHADOW_OUT);
 		output_squares[n] = gtk_table_new(3,3,FALSE);
 	}
 	for(n=0; n<81; n++){
@@ -197,7 +201,7 @@ int main( int argc, char *argv[] ){
 		gtk_entry_set_max_length(GTK_ENTRY(entry[n]), 1);
 		gtk_entry_set_width_chars(GTK_ENTRY(entry[n]), 1);
 		entry_frame[n] = gtk_frame_new(NULL);
-		gtk_frame_set_shadow_type(GTK_FRAME(entry_frame[n]), GTK_SHADOW_OUT);
+		gtk_frame_set_shadow_type(GTK_FRAME(entry_frame[n]), (GtkShadowType) GTK_SHADOW_OUT);
 		gtk_container_add(GTK_CONTAINER(entry_frame[n]), entry[n]);
 		// ouput
 		output[n] = gtk_entry_new();
@@ -205,7 +209,7 @@ int main( int argc, char *argv[] ){
 		gtk_entry_set_width_chars(GTK_ENTRY(output[n]), 1);
 		gtk_entry_set_editable(GTK_ENTRY(output[n]), FALSE);
 		output_frame[n] = gtk_frame_new(NULL);
-		gtk_frame_set_shadow_type(GTK_FRAME(output_frame[n]), GTK_SHADOW_OUT);
+		gtk_frame_set_shadow_type(GTK_FRAME(output_frame[n]), (GtkShadowType)GTK_SHADOW_OUT);
 		gtk_container_add(GTK_CONTAINER(output_frame[n]), output[n]);
 	}
 	// entry
@@ -213,20 +217,20 @@ int main( int argc, char *argv[] ){
 		for(m=0;m<9;m++){
 			// position = square starting row + square starting column + row + col
 			position = ((n/3)*27) + ((n%3)*3) + ((m/3)*9) + (m%3);
-			gtk_table_attach(GTK_TABLE(entry_squares[n]), entry_frame[position], m%3, (m%3) + 1, m/3, (m/3) + 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 5);
+			gtk_table_attach(GTK_TABLE(entry_squares[n]), entry_frame[position], m%3, (m%3) + 1, m/3, (m/3) + 1, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 5);
 		}
 		gtk_container_add(GTK_CONTAINER(entry_square_frame[n]), entry_squares[n]);
-		gtk_table_attach(GTK_TABLE(sudoku_table), entry_square_frame[n], n%3, (n%3) + 1, (n/3)+1, (n/3) + 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
+		gtk_table_attach(GTK_TABLE(sudoku_table), entry_square_frame[n], n%3, (n%3) + 1, (n/3)+1, (n/3) + 2, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 0, 0);
 	}
 	// output
 	for(n=0; n<9; n++){
 		for(m=0;m<9;m++){
 			// position = square starting row + square starting column + row + col
 			position = ((n/3)*27) + ((n%3)*3) + ((m/3)*9) + (m%3);
-			gtk_table_attach(GTK_TABLE(output_squares[n]), output_frame[position], m%3, (m%3) + 1, m/3, (m/3) + 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 5);
+			gtk_table_attach(GTK_TABLE(output_squares[n]), output_frame[position], m%3, (m%3) + 1, m/3, (m/3) + 1, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 5);
 		}
 		gtk_container_add(GTK_CONTAINER(output_square_frame[n]), output_squares[n]);
-		gtk_table_attach(GTK_TABLE(sudoku_table), output_square_frame[n], (n%3)+4, (n%3) + 5, (n/3)+1, (n/3) + 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
+		gtk_table_attach(GTK_TABLE(sudoku_table), output_square_frame[n], (n%3)+4, (n%3) + 5, (n/3)+1, (n/3) + 2, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 0, 0);
 	}
 	gtk_container_add(GTK_CONTAINER(window), sudoku_table);
 	
@@ -235,18 +239,18 @@ int main( int argc, char *argv[] ){
 	button_table = gtk_table_new(1,2,FALSE);	
 	
 	solve_button = gtk_button_new_with_label("Solve");
-	gtk_table_attach(GTK_TABLE(button_table), solve_button, 0,1,0,1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 5);  
+	gtk_table_attach(GTK_TABLE(button_table), solve_button, 0,1,0,1, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 5);  
 	clear_start_button = gtk_button_new_with_label("Clear Start");
-	gtk_table_attach(GTK_TABLE(button_table), clear_start_button, 0,1,1,2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 5);   
+	gtk_table_attach(GTK_TABLE(button_table), clear_start_button, 0,1,1,2, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 5);   
 	clear_solution_button = gtk_button_new_with_label("Clear Solution");
-	gtk_table_attach(GTK_TABLE(button_table), clear_solution_button, 0,1,2,3, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 5); 
+	gtk_table_attach(GTK_TABLE(button_table), clear_solution_button, 0,1,2,3, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 5); 
 	
-	gtk_table_attach(GTK_TABLE(sudoku_table), button_table, 3,4,2,3, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 5);
+	gtk_table_attach(GTK_TABLE(sudoku_table), button_table, 3,4,2,3, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 5);
 	
 	starting_sudoku_label = gtk_label_new("Enter Starting Sudoku Below:");
-	gtk_table_attach(GTK_TABLE(sudoku_table), starting_sudoku_label, 0,2,0,1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 5);  
+	gtk_table_attach(GTK_TABLE(sudoku_table), starting_sudoku_label, 0,2,0,1, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 5);  
 	completed_sudoku_label = gtk_label_new("Solved Sudoku:");
-	gtk_table_attach(GTK_TABLE(sudoku_table), completed_sudoku_label, 4,5,0,1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 5); 
+	gtk_table_attach(GTK_TABLE(sudoku_table), completed_sudoku_label, 4,5,0,1, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 5); 
 	
 	// File I/O stuff
 	GtkWidget *file_label;
@@ -259,10 +263,10 @@ int main( int argc, char *argv[] ){
 	write_file_button = gtk_button_new_with_label("write file");
 	read_file_button = gtk_button_new_with_label("read file");
 	
-	gtk_table_attach(GTK_TABLE(sudoku_table), file_label, 0,1,4,5, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 20); 
-	gtk_table_attach(GTK_TABLE(sudoku_table), filename_entry, 1,4,4,5, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 20); 
-	gtk_table_attach(GTK_TABLE(sudoku_table), read_file_button, 4,5,4,5, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 20);
-	gtk_table_attach(GTK_TABLE(sudoku_table), write_file_button, 5,6,4,5, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 5, 20);
+	gtk_table_attach(GTK_TABLE(sudoku_table), file_label, 0,1,4,5, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 20); 
+	gtk_table_attach(GTK_TABLE(sudoku_table), filename_entry, 1,4,4,5, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 20); 
+	gtk_table_attach(GTK_TABLE(sudoku_table), read_file_button, 4,5,4,5, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 20);
+	gtk_table_attach(GTK_TABLE(sudoku_table), write_file_button, 5,6,4,5, (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), (GtkAttachOptions) (GTK_FILL | GTK_SHRINK), 5, 20);
 	
         
     // flag all widgets to be displayed (otherwise it wont show up)
