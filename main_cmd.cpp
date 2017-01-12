@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include "sudoku.h"
+#include "sudoku_examples.h"
 
 #define SUDOKU_TO_SOLVE courier_sudoku
 

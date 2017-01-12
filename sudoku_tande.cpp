@@ -16,12 +16,8 @@ unsigned char solvable(unsigned char sudoku[82], unsigned char master_possibilit
 unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_sudoku[82], unsigned char master_possibilities[10][82]){
 	unsigned char n, num, opcode;
 	unsigned char *data;
-	
-	// function array definition
-	unsigned char* (*func_array[3])(unsigned char, unsigned char [82]) = {NULL};
-	func_array[0] = &extract_square;
-	func_array[1] = &extract_row;
-	func_array[2] = &extract_col;
+	// define a function array for the extract functions
+	unsigned char* (*extract[3])(unsigned char, unsigned char [82]) = {&extract_square, &extract_row, &extract_col};
 	
 	// load end_sudoku with start sudoku values
 	for(n = 0; n < 81; n++){
@@ -34,7 +30,7 @@ unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_
 		for(n = 0; n < 9; n++){
 			// loop through all numbers
 			for(num = 1; num<=8; num++){
-				data = (*func_array[opcode])(n, master_possibilities[num]);
+				data = (*extract[opcode])(n, master_possibilities[num]);
 				// find out if current number has two possibilities in current location
 				if(is_num(data, 1) == 2){
 					printf("Number %d has 2 possibilities in %s %d\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n);

@@ -161,9 +161,12 @@ unsigned int count_possibilties(unsigned char master_possibilities[10][82]){
 
 // function to update the master_possibilities array
 void update_master_possibilities(unsigned char sudoku[82], unsigned char master_possibilities[10][82]) {
-	unsigned char n,m, square_num, row, col, num, position, row_line_up, col_line_up;
+	unsigned char n,m, square_num, row, col, num, position, row_line_up, col_line_up, opcode, opcode_num;
 	unsigned char position1 = 0, position2 = 0, position3 = 0;
 	unsigned char *data, *possibility_data;
+	// define a function array for the extract functions
+	unsigned char* (*extract[3])(unsigned char, unsigned char [82]) = {&extract_square, &extract_row, &extract_col};
+	
 	// cycle through numbers to eliminate stuff
 	for (num = 1; num <= 9; num++) {
 		// eliminate based on squares
@@ -171,27 +174,18 @@ void update_master_possibilities(unsigned char sudoku[82], unsigned char master_
 			data = extract_square(square_num, sudoku);
 			// does it already exist here??
 			if (is_num(data, num) == 0) {
-				// eliminate possibilities by row
-				for (n = 0; n < 3; n++) {
-					row = ((square_num / 3) * 3) + n;
-					// check to see if number in that row and eliminate that row from possibility if so
-					if (is_num(extract_row(row, sudoku), num) == 1) {
-						for (m = 0; m < 3; m++) {
-							// position = square starting column + current row + m
-							position = ((square_num % 3) * 3) + (row * 9) + m;
-							master_possibilities[num][position] = 0;
-						}
-					}
-				}
-				// eliminate possibilities by column
-				for (n = 0; n < 3; n++) {
-					col = ((square_num % 3) * 3) + n;
-					// check to see if number in that col and eliminate that col from possibility if so
-					if (is_num(extract_col(col, sudoku), num) == 1) {
-						for (m = 0; m < 3; m++) {
-							// position = square starting row + current column + m time row
-							position = ((square_num / 3) * 27) + col + (m * 9);
-							master_possibilities[num][position] = 0;
+				// loop through opcodes 1 and 2 row then col
+				for(opcode = 1; opcode < 3; opcode++){
+					for (n = 0; n < 3; n++) {
+						opcode_num = ((opcode == 1) ? (((square_num / 3) * 3) + n) : (((square_num % 3) * 3) + n));
+						// check to see if number in that row and eliminate that row from possibility if so
+						if (is_num((*extract[opcode])(opcode_num, sudoku), num) == 1) {
+							for (m = 0; m < 3; m++) {
+								// if row (opcode = 1): position = square starting column + current row + m
+								// if col (opcode = 2): position = square starting row + current column + m time row
+								position = ((opcode == 1) ? (((square_num % 3) * 3) + (opcode_num * 9) + m) : (((square_num / 3) * 27) + opcode_num + (m * 9)));
+								master_possibilities[num][position] = 0;
+							}
 						}
 					}
 				}
@@ -365,18 +359,19 @@ void extreme_update(unsigned char sudoku[82], unsigned char master_possibilities
 	}
 }
 
-// fucntion to test some more methods for extreme_update
+// function to test some more methods for extreme_update
 void extreme_test(unsigned char sudoku[82], unsigned char master_possibilities[10][82]) {
 	/*** IF x (2 OR MORE) NUMBERS SHARE THE SAME x POSSIBILITIES THEN NO OTHER NUMBER CAN BE PUT IN THESE POSSIBILITIES ***/
 	// this happens for numbers 3 and 8 in square 3 of the challenging metro sudoku
 	unsigned char square, num, n, m, p, match, position;
+	unsigned char index = 0, two_poss_count = 0;
+	unsigned char *data;
+	unsigned char two_poss[10] = { 0,0,0,0,0,0,0,0,0 };
+	unsigned char locations[3] = { 0,0 };
 	// cycle through squares
 	for (square = 0; square < 9; square++) {
-		unsigned char index = 0;
-		unsigned char two_poss_count = 0;
-		unsigned char two_poss[10] = { 0,0,0,0,0,0,0,0,0 };
-		unsigned char locations[3] = { 0,0 };
-		unsigned char *data;
+		index = 0;
+		two_poss_count = 0;
 		// cycle through numbers
 		for (num = 1; num <= 9; num++) {
 			// if 2 possibilities make a note of this
@@ -440,53 +435,32 @@ void enter_number(unsigned char num, unsigned char position, unsigned char sudok
 
 // function to find all places numbers can go and enter them into sudoku
 void possibility_solve(unsigned char sudoku[82], unsigned char master_possibilities[10][82]) {
-	unsigned char square_num, n, num, position, row, col, possibilities;
+	unsigned char opcode_num, n, num, position, possibilities, opcode;
 	unsigned char *data;
+	// define a function array for the extract functions
+	unsigned char* (*extract[3])(unsigned char, unsigned char [82]) = {&extract_square, &extract_row, &extract_col};
+	
 	// look through all numbers
 	for (num = 1; num <= 9; num++) {
-		//printf("possibilities for %d", num);
-		//sudoku_print(master_possibilities[num]);
-		// look through squares to find unique positions
-		for (square_num = 0; square_num < 9; square_num++) {
-			data = extract_square(square_num, sudoku);
-			if (is_num(data, num) == 0) {
-				data = extract_square(square_num, master_possibilities[num]);
-				if (is_num(data, 1) == 1) {
-					n = where_num(data, 1);
-					// position = square starting col + square starting row + col in square + row in square
-					position = ((square_num % 3) * 3) + ((square_num / 3) * 27) + (n % 3) + ((n / 3) * 9);
-					enter_number(num, position, sudoku, master_possibilities);
-					//printf("Unique position found for number %d in square %d position %d, global position %d\n", num, square_num, n, position);
-				}
-			}
-		}
-		
-		// look through rows to find unique positions
-		for (row = 0; row < 9; row++) {
-			data = extract_row(row, sudoku);
-			if (is_num(data, num) == 0) {
-				data = extract_row(row, master_possibilities[num]);
-				if (is_num(data, 1) == 1) {
-					n = where_num(data, 1);
-					// position = row + n
-					position = (row * 9) + n;
-					enter_number(num, position, sudoku, master_possibilities);
-					//printf("Unique position found for number %d in row %d position %d, global position %d\n", num, row, n, position);
-				}
-			}
-		}
-				
-		// look through cols to find unique positions
-		for (col = 0; col < 9; col++) {
-			data = extract_col(col, sudoku);
-			if (is_num(data, num) == 0) {
-				data = extract_col(col, master_possibilities[num]);
-				if (is_num(data, 1) == 1) {
-					n = where_num(data, 1);
-					// position = n row + col
-					position = (n * 9) + col;
-					enter_number(num, position, sudoku, master_possibilities);
-					//printf("Unique position found for number %d in column %d position %d, global position %d\n", num, col, n, position);
+		// loop through opcodes in extract function array (square, row, col)
+		for(opcode = 0; opcode < 3; opcode++){
+			// look through <opcode>s to find unique positions
+			for (opcode_num = 0; opcode_num < 9; opcode_num++) {
+				data = extract_square(opcode_num, sudoku);
+				if (is_num(data, num) == 0) {
+					data = extract_square(opcode_num, master_possibilities[num]);
+					if (is_num(data, 1) == 1) {
+						n = where_num(data, 1);
+						if(opcode == 0){
+							// if square: position = square starting col + square starting row + col in square + row in square
+							position = ((opcode_num % 3) * 3) + ((opcode_num / 3) * 27) + (n % 3) + ((n / 3) * 9);
+						}
+						else{
+							// if row: position = row + n, if col: position = n row + col
+							position = ((opcode == 1) ? ((opcode_num * 9) + n) : ((n * 9) + opcode));
+						}
+						enter_number(num, position, sudoku, master_possibilities);
+					}
 				}
 			}
 		}
@@ -516,36 +490,17 @@ void possibility_solve(unsigned char sudoku[82], unsigned char master_possibilit
 
 // function to verify solver return 0 = correct, 1 = incorrect
 void sudoku_verify(unsigned char sudoku[82]) {
-	unsigned char num, n;
+	unsigned char num, n, opcode;
+	// define a function array for the extract functions
+	unsigned char* (*extract[3])(unsigned char, unsigned char [82]) = {&extract_square, &extract_row, &extract_col};
+	
 	for (num = 1; num <= 9; num++) {
-		// check rows
-		for (n = 0; n < 9; n++) {
-			if (is_num(extract_row(n, sudoku), num) > 1) {
-				#ifdef ARDUINO_AVR_UNO
-				printf("Error!!");
-				#else
-				printf("\nError!! - More than one %d in row %d\n", num, n);
-				#endif
-			}
-		}
-		// check columns
-		for (n = 0; n < 9; n++) {
-			if (is_num(extract_col(n, sudoku), num) > 1) {
-				#ifdef ARDUINO_AVR_UNO
-				printf("Error!!");
-				#else
-				printf("\nError!! - More than one %d in col %d\n", num, n);
-				#endif
-			}
-		}
-		// check sqaures
-		for (n = 0; n < 9; n++) {
-			if (is_num(extract_square(n, sudoku), num) > 1) {
-				#ifdef ARDUINO_AVR_UNO
-				printf("Error!!");
-				#else
-				printf("\nError!! - More than one %d in square %d\n", num, n);
-				#endif
+		for(opcode = 0; opcode < 3; opcode++){
+			// check rows
+			for (n = 0; n < 9; n++) {
+				if (is_num((*extract[opcode])(n, sudoku), num) > 1) {
+					printf("\nError!! - More than one %d in %s %d\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n);
+				}
 			}
 		}
 	}

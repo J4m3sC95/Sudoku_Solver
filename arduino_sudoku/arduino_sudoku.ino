@@ -22,14 +22,15 @@ static unsigned char my_sudoku[82] = {
 
 #include "sudoku.h"
 
-//#define SUDOKU_TO_SOLVE courier_sudoku
 #define SUDOKU_TO_SOLVE my_sudoku
+
+unsigned char master_possibilities[10][82];
 
 void setup() {
   Serial.begin(9600);
   // put your setup code here, to run once:
   unsigned long time = millis();
-  sudoku_solve(SUDOKU_TO_SOLVE);
+  sudoku_solve(SUDOKU_TO_SOLVE, SUDOKU_TO_SOLVE, master_possibilities);
   time = millis() - time;
   Serial.print("Run time = ");
   Serial.print(time);
