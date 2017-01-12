@@ -11,11 +11,11 @@ unsigned char solvable(unsigned char sudoku[82], unsigned char master_possibilit
 	return 0;
 }
 
-
 // Function to solve a sudoku by trial and error
 unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_sudoku[82], unsigned char master_possibilities[10][82]){
-	unsigned char n, num, opcode;
+	unsigned char n, num, opcode, sub_num;
 	unsigned char *data;
+	unsigned char location[] = {0,0};
 	// define a function array for the extract functions
 	unsigned char* (*extract[3])(unsigned char, unsigned char [82]) = {&extract_square, &extract_row, &extract_col};
 	
@@ -33,12 +33,27 @@ unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_
 				data = (*extract[opcode])(n, master_possibilities[num]);
 				// find out if current number has two possibilities in current location
 				if(is_num(data, 1) == 2){
-					printf("Number %d has 2 possibilities in %s %d\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n);
+					location[0] = where_num(data, 1);
+					location[1] = where_num(data, 1, 1);
+					// now we've found a number with two possibilities in this location can we find another with the same
+					for(sub_num = num + 1; sub_num <=9; sub_num++){
+						data = (*extract[opcode])(n, master_possibilities[sub_num]);
+						// find out if current number has two possibilities in current location
+						if(is_num(data, 1) == 2){
+							if((where_num(data,1) == location[0]) && (where_num(data,1,1) == location[1])){
+								printf("Number %d has 2 possibilities in %s %d at locations %d and %d and so does number %d\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n, location[0], location[1], sub_num);
+								goto found_match;
+							}
+						}
+					}
 				}
 			}
 		}
 	}
-	// extract data from a row/col/square
+	// program will continue to this point if a match is found
+	// (could perhaps avoid this and store all options for future use if this doesnt work?)
+	found_match:
+	
 	// attempt to solve the sudokus with the numbers one way around and then the other
 	// if can't solve and it still possible to complete then either run this function again (recursively?) with two new pairs or try a different pair?
 	return 0;

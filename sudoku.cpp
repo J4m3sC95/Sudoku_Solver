@@ -24,12 +24,14 @@ unsigned char is_num(unsigned char data[10], unsigned char num) {
 }
 
 // function to find number in 9 element array (row/col/square)
+// search direction defined by argument direction: 0 (default) = forwards, 1 = reverse;
 // 0 if not there, otherwise returns location
-unsigned char where_num(unsigned char data[10], unsigned char num) {
-	unsigned char n;
+unsigned char where_num(unsigned char data[10], unsigned char num, unsigned char direction) {
+	unsigned char n, m;
 	for (n = 0; n < 9; n++) {
-		if (data[n] == num) {
-			return n;
+		m = (direction ? (8 - n) : n);
+		if (data[m] == num) {
+			return m;
 		}
 	}
 	return 0;

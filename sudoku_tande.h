@@ -1,5 +1,5 @@
 /*
- * Header file for sudoku.c
+ * Header file for sudoku_tande.cpp
  *
  */
 

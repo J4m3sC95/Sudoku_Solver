@@ -1,5 +1,5 @@
 /*
- * Header file for sudoku.c
+ * Header file which contains example sudokus to solve
  *
  */
 

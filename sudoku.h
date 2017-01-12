@@ -16,7 +16,7 @@
 
 /***** FUNCTION PROTOTYPES ******/
 unsigned char is_num(unsigned char data[10], unsigned char num);
-unsigned char where_num(unsigned char data[10], unsigned char num);
+unsigned char where_num(unsigned char data[10], unsigned char num, unsigned char direction = 0);
 unsigned char *extract_square(unsigned char square, unsigned char sudoku[82]);
 unsigned char *extract_row(unsigned char row, unsigned char sudoku[82]);
 unsigned char *extract_col(unsigned char col, unsigned char sudoku[82]);
