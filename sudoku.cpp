@@ -214,8 +214,8 @@ void update_master_possibilities(unsigned char sudoku[82], unsigned char master_
 						position3 = position2;
 					}
 					// do the 2 or 3 possibilities line up?
-					row_line_up = ((position1 / 3) == (position2 / 3)) & ((position2 / 3) == (position3 / 3));
-					col_line_up = ((position1 % 3) == (position2 % 3))&((position2 % 3) == (position3 % 3));
+					row_line_up = ((position1 / 3) == (position2 / 3)) && ((position2 / 3) == (position3 / 3));
+					col_line_up = ((position1 % 3) == (position2 % 3)) && ((position2 % 3) == (position3 % 3));
 					if (row_line_up) {
 						row = (position1 / 3) + (square_num / 3) * 3;
 						for (n = 0; n < 9; n++) {
@@ -292,7 +292,7 @@ void extreme_update(unsigned char sudoku[82], unsigned char master_possibilities
 							row_count++;
 							if (row_count == 2) {
 								squares[2] = 0;
-								while ((squares[2] == squares[0]) | (squares[2] == squares[1])) {
+								while ((squares[2] == squares[0]) || (squares[2] == squares[1])) {
 									squares[2] ++;
 								}
 								for (q = 0; q < 9; q++) {
@@ -342,7 +342,7 @@ void extreme_update(unsigned char sudoku[82], unsigned char master_possibilities
 							col_count++;
 							if (col_count == 2) {
 								squares[2] = 0;
-								while ((squares[2] == squares[0]) | (squares[2] == squares[1])) {
+								while ((squares[2] == squares[0]) || (squares[2] == squares[1])) {
 									squares[2] ++;
 								}
 								for (q = 0; q < 9; q++) {
@@ -407,7 +407,7 @@ void extreme_test(unsigned char sudoku[82], unsigned char master_possibilities[1
 						}
 						// remove these as possibilities for other numbers
 						for (num = 1; num <= 9; num++) {
-							if ((num != two_poss[n]) & (num != two_poss[n + m])) {
+							if ((num != two_poss[n]) && (num != two_poss[n + m])) {
 								// position = square starting col + square starting row + current row + current col
 								position = ((square % 3) * 3) + ((square / 3) * 27) + ((locations[0] / 3) * 9) + (locations[0] % 3);
 								master_possibilities[num][position] = 0;
@@ -537,7 +537,7 @@ unsigned char sudoku_solve(unsigned char start_sudoku[82], unsigned char end_sud
 		new_poss_count = count_possibilties(master_possibilities);
 		iterations += 1;
 		printf("After Iteration %d, %d gaps and %d possibilities remain\n", iterations, new_gaps, new_poss_count);
-	} while (((new_gaps != old_gaps)|(new_poss_count != old_poss_count)) && (new_gaps != 0));
+	} while (((new_gaps != old_gaps) || (new_poss_count != old_poss_count)) && (new_gaps != 0));
 
 	printf("\nSolver Complete - ");
 
