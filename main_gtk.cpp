@@ -49,7 +49,12 @@ void solve_button_press(GtkWidget *widget, gpointer window){
 			sudoku_input[n] = 0;
 		}
 	}
-	
+	unsigned char **possibility_matrix = (unsigned char**) malloc(10*sizeof(unsigned char*));
+	// build possibility array
+	for(n = 0; n < 10; n++){
+		possibility_matrix[n] = (unsigned char*) malloc(82*sizeof(unsigned char));
+	}
+	build_master_possibilities(sudoku_input, possibility_matrix);
 	sudoku_solve(sudoku_input, sudoku_output, possibility_matrix);
 	for(n = 0; n<81; n++){
 		//char fill;
