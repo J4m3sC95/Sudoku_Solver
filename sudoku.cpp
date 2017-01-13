@@ -195,7 +195,7 @@ void update_master_possibilities(unsigned char sudoku[82], unsigned char master_
 				// eliminate possibilities in other squares based on 2 or 3 possibilities lining up in this square
 				possibility_data = extract_square(square_num, master_possibilities[num]);
 				m = is_num(possibility_data, 1);
-				if ((m == 2) | (m == 3)) {
+				if ((m == 2) || (m == 3)) {
 					// where are they
 					position1 = where_num(possibility_data, 1);
 					for (n = 0; n <= 9; n++) {
