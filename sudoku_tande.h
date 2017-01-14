@@ -11,7 +11,7 @@
 #include "sudoku.h"
 #include "sudoku_examples.h"
 
-#define SUDOKU_TO_SOLVE metro_sudoku_challenging
+#define SUDOKU_TO_SOLVE very_difficult
 
 // function prototypes
 unsigned char solvable(unsigned char sudoku[82], unsigned char master_possibilities[10][82]);

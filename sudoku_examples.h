@@ -6,6 +6,21 @@
 #ifndef SUDOKU_EXAMPLES_H
 #define SUDOKU_EXAMPLES_H
 
+// very tricky sudoku from http://www.7sudoku.com/very-difficult
+static unsigned char very_difficult[82] = {
+  0,2,5,  3,6,4,  0,0,0,
+  7,4,0,  0,0,5,  0,0,0,
+  0,0,9,  0,7,0,  0,0,0,
+  
+  5,0,0,  0,0,0,  0,7,3,
+  0,0,0,  7,0,6,  0,0,0,
+  6,1,0,  0,0,0,  0,0,2,
+  
+  0,0,0,  0,1,0,  3,0,0,
+  0,0,0,  5,0,0,  0,8,9,
+  0,0,0,  6,3,9,  1,5,0
+};
+
 // easy sudoku from 1st march metro
 static unsigned char metro_sudoku_easy[82] = {
   5,0,7,  0,8,1,  0,0,0,
