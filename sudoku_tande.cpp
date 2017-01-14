@@ -30,7 +30,7 @@ unsigned char find_global_position(unsigned char local_position, unsigned char l
 
 // Function to solve a sudoku by trial and error
 unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_sudoku[82], unsigned char **master_possibilities){
-	unsigned char n, m, num, opcode, sub_num;
+	unsigned char n, m, num, opcode, sub_num, attempt1, attempt2;
 	unsigned char *data;
 	unsigned char location[] = {0,0};
 	// define a function array for the extract functions
@@ -95,17 +95,27 @@ unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_
 		sudoku_attempt2[n] = end_sudoku[n];
 	}
 
-	enter_number(num, location[1], sudoku_attempt1, master_possibilities_attempt1);
-	enter_number(sub_num, location[0], sudoku_attempt1, master_possibilities_attempt1); 
-	printf("\nAfter entering these numbers:\n");
-	sudoku_print(sudoku_attempt1);
-	printf("\nAttempting to solve this new sudoku:\n");
-	sudoku_solve(sudoku_attempt1, sudoku_attempt1, master_possibilities_attempt1);
-	
-	
-	
 	// attempt to solve the sudokus with the numbers one way around and then the other
+	printf("\nSolving sudoku with %d in %s %d position %d and %d in position %d\n\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n, location[0], sub_num, location[1]);
+	enter_number(num, location[0], sudoku_attempt1, master_possibilities_attempt1);
+	enter_number(sub_num, location[1], sudoku_attempt1, master_possibilities_attempt1);
+	attempt1 = sudoku_solve(sudoku_attempt1, sudoku_attempt1, master_possibilities_attempt1);
 	
+	if(attempt1 == 0){
+		return 0;
+	}
+	else{
+		printf("\nSolving sudoku with %d in %s %d position %d and %d in position %d\n\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n, location[1], sub_num, location[0]);
+		enter_number(num, location[1], sudoku_attempt2, master_possibilities_attempt2);
+		enter_number(sub_num, location[0], sudoku_attempt2, master_possibilities_attempt2);
+		attempt2 = sudoku_solve(sudoku_attempt2, sudoku_attempt2, master_possibilities_attempt2);
+		if(attempt2 == 0){
+			return 0;
+		}
+	}
+	
+	// need to determine if still possible to solve if neither works
+		
 	// if can't solve and it still possible to complete then either run this function again (recursively?) with two new pairs or try a different pair?
 	return 0;
 }
