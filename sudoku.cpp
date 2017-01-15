@@ -507,6 +507,7 @@ unsigned char sudoku_verify(unsigned char sudoku[82]) {
 			}
 		}
 	}
+	return 0;
 }
 
 // function to solve sudoku

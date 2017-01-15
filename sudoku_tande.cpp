@@ -3,13 +3,12 @@
  */
 
 #include "sudoku_tande.h"
-
-// Function to find all places where two numbers share possibilities (return a vector?)
-
-// Function to determine whether it is still possible to solve the sudoku
+/*
+// Function to determine whether it is still possible to solve the sudoku (not needed for all sudokus tried)
 unsigned char solvable(unsigned char sudoku[82], unsigned char **master_possibilities){
 	return 0;
 }
+* */
 
 // function which returns global position based on a local position
 unsigned char find_global_position(unsigned char local_position, unsigned char local_feature, unsigned char local_feature_num){
@@ -134,23 +133,24 @@ unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_
 	return 0;
 }
 
-int main() {
+unsigned char sudoku_solve_tande(unsigned char input_sudoku[82], unsigned char output_sudoku[82]) {
 	unsigned char n;
 	printf("\nJames' Sudoku Solving Program Version 3\n\n");
 	
-	unsigned char output_sudoku[82];	
+	// unsigned char output_sudoku[82];	
 	unsigned char **possibility_matrix = (unsigned char**) malloc(10*sizeof(unsigned char*));
 	for(n = 0; n < 10; n++){
 		possibility_matrix[n] = (unsigned char*) malloc(82*sizeof(unsigned char));
 	}
 	
-	build_master_possibilities(SUDOKU_TO_SOLVE, possibility_matrix);
+	build_master_possibilities(input_sudoku, possibility_matrix);
 	
 	printf("Starting sudoku:\n");
-	sudoku_print(SUDOKU_TO_SOLVE);	
+	sudoku_print(input_sudoku);	
 	printf("\nStarting standard solver...\n");
-	sudoku_solve(SUDOKU_TO_SOLVE, output_sudoku, possibility_matrix);
-	trial_and_error(output_sudoku, output_sudoku, possibility_matrix);
+	if(sudoku_solve(input_sudoku, output_sudoku, possibility_matrix)){
+		trial_and_error(output_sudoku, output_sudoku, possibility_matrix);
+	}
 	printf("\nFinal sudoku:\n");
 	sudoku_print(output_sudoku);
 	printf("\n");
