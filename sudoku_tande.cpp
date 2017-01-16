@@ -57,7 +57,10 @@ unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_
 						// find out if current number has two possibilities in current location
 						if(is_num(data, 1) == 2){
 							if((where_num(data,1) == location[0]) && (where_num(data,1,1) == location[1])){
-								printf("\nTrial and error solver:\nNumber %d has 2 possibilities in %s %d at locations %d and %d and so does number %d\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n, location[0], location[1], sub_num);
+								printf("Trial and error solver: ");
+								#ifdef PRINT_ALL_OUTPUT
+								printf("\nNumber %d has 2 possibilities in %s %d at locations %d and %d and so does number %d\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n, location[0], location[1], sub_num);
+								#endif
 								goto found_match;
 							}
 						}
@@ -66,6 +69,8 @@ unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_
 			}
 		}
 	}
+	printf("Error!! - no possible locations\n\n");
+	return 0xFF;
 	// program will continue to this point if a match is found
 	// (could perhaps avoid this and store all options for future use if this doesnt work?)
 	found_match:
@@ -73,7 +78,9 @@ unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_
 	// calculate global positions from the local positions		
 	location[0] = find_global_position(location[0], opcode, n);
 	location[1] = find_global_position(location[1], opcode, n);
+	#ifdef PRINT_ALL_OUTPUT
 	printf("This equates to global positions %d and %d\n", location[0], location[1]); 
+	#endif
 	
 	// build some new arrays to house the master_possibilities for the new solving
 	unsigned char **master_possibilities_attempt1 = (unsigned char**)malloc(10*sizeof(unsigned char*));
@@ -95,47 +102,76 @@ unsigned char trial_and_error(unsigned char start_sudoku[82], unsigned char end_
 	}
 
 	// attempt to solve the sudokus with the numbers one way around and then the other
+	#ifdef PRINT_ALL_OUTPUT
 	printf("\nSolving sudoku with %d in %s %d position %d and %d in position %d...\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n, location[0], sub_num, location[1]);
+	#endif
 	enter_number(num, location[0], sudoku_attempt1, master_possibilities_attempt1);
 	enter_number(sub_num, location[1], sudoku_attempt1, master_possibilities_attempt1);
-	attempt1 = sudoku_solve(sudoku_attempt1, end_sudoku, master_possibilities_attempt1);
+	attempt1 = sudoku_solve(sudoku_attempt1, sudoku_attempt1, master_possibilities_attempt1);
 	
 	if(attempt1 == 0){
-		/*
 		for(m = 0; m < 81; m++){
 			end_sudoku[m] = sudoku_attempt1[m];
 			
 		}
-		* */
+		#ifdef PRINT_ALL_OUTPUT
 		sudoku_print(sudoku_attempt1);
+		#endif
 		return 0;
 	}
 	else{
+		#ifdef PRINT_ALL_OUTPUT
 		printf("\nSolving sudoku with %d in %s %d position %d and %d in position %d...\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n, location[1], sub_num, location[0]);
+		#endif
 		enter_number(num, location[1], sudoku_attempt2, master_possibilities_attempt2);
 		enter_number(sub_num, location[0], sudoku_attempt2, master_possibilities_attempt2);
-		attempt2 = sudoku_solve(sudoku_attempt2, end_sudoku, master_possibilities_attempt2);
+		attempt2 = sudoku_solve(sudoku_attempt2, sudoku_attempt2, master_possibilities_attempt2);
 		if(attempt2 == 0){
-			/*
 			for(m = 0; m < 81; m++){
 				end_sudoku[m] = sudoku_attempt2[m];
 				
 			}
-			*/
+			#ifdef PRINT_ALL_OUTPUT
 			sudoku_print(sudoku_attempt2);
+			#endif
 			return 0;
 		}
 	}
 	
 	// need to determine if still possible to solve if neither works
+	if(attempt1 && attempt2){
+		if(attempt1 == 0xFF){
+			for(m = 0; m < 81; m++){
+				end_sudoku[m] = sudoku_attempt2[m];
+				for(p = 0; p <10; p++){
+					master_possibilities[p][m] = master_possibilities_attempt2[p][m];
+				}
+			}
+			return attempt2;
+		}
+		else if(attempt2 == 0xFF){
+			for(m = 0; m < 81; m++){
+				end_sudoku[m] = sudoku_attempt1[m];
+				for(p = 0; p <10; p++){
+					master_possibilities[p][m] = master_possibilities_attempt1[p][m];
+				}
+			}
+			return attempt1;
+		}
+		return 0xFF;
+	}
+	
+
 		
 	// if can't solve and it still possible to complete then either run this function again (recursively?) with two new pairs or try a different pair?
 	return 0;
 }
 
 unsigned char sudoku_solve_tande(unsigned char input_sudoku[82], unsigned char output_sudoku[82]) {
-	unsigned char n;
+	unsigned char n, old_gaps, new_gaps;
+	#ifdef PRINT_ALL_OUTPUT
 	printf("\nJames' Sudoku Solving Program Version 3\n\n");
+	#endif
 	
 	// unsigned char output_sudoku[82];	
 	unsigned char **possibility_matrix = (unsigned char**) malloc(10*sizeof(unsigned char*));
@@ -144,16 +180,32 @@ unsigned char sudoku_solve_tande(unsigned char input_sudoku[82], unsigned char o
 	}
 	
 	build_master_possibilities(input_sudoku, possibility_matrix);
-	
+	#ifdef PRINT_ALL_OUTPUT
 	printf("Starting sudoku:\n");
 	sudoku_print(input_sudoku);	
 	printf("\nStarting standard solver...\n");
-	if(sudoku_solve(input_sudoku, output_sudoku, possibility_matrix)){
-		trial_and_error(output_sudoku, output_sudoku, possibility_matrix);
+	#endif
+	new_gaps = sudoku_solve(input_sudoku, output_sudoku, possibility_matrix);
+	if(new_gaps){
+		#ifdef PRINT_ALL_OUTPUT
+		printf("\n");
+		#endif
+		//trial_and_error(output_sudoku, output_sudoku, possibility_matrix);
+		
+		do{
+			old_gaps = new_gaps;
+			new_gaps = trial_and_error(output_sudoku, output_sudoku, possibility_matrix);
+			if(new_gaps == 0xFF){
+				return 0xFF;
+			}
+		} while((old_gaps != new_gaps) && (new_gaps != 0));
+		
 	}
+	#ifdef PRINT_ALL_OUTPUT
 	printf("\nFinal sudoku:\n");
 	sudoku_print(output_sudoku);
 	printf("\n");
+	#endif
 
 	// wait till key press (for windows)
 	// getchar();

@@ -7,7 +7,8 @@
 #include "sudoku_tande.h"
 #include "sudoku_examples.h"
 
-#define SUDOKU_TO_SOLVE metro_sudoku_easy
+//#define SUDOKU_TO_SOLVE worlds_hardest
+#define SUDOKU_TO_SOLVE very_difficult
 unsigned char output_sudoku[82];
 
 int main() {

@@ -522,9 +522,14 @@ unsigned char sudoku_solve(unsigned char start_sudoku[82], unsigned char end_sud
 
 	new_poss_count = count_possibilties(master_possibilities);
 	new_gaps = count_gaps(master_possibilities);
-	//printf("Starting sudoku:\n");
-	//sudoku_print(end_sudoku);
+	#ifdef PRINT_ALL_OUTPUT
+	printf("Starting sudoku:\n");
+	sudoku_print(end_sudoku);
+	#endif
 	printf("Starting gaps = %d", new_gaps);
+	#ifdef PRINT_ALL_OUPUT
+	printf("\n\n");
+	#endif
 	do{
 		old_gaps = new_gaps;
 		old_poss_count = new_poss_count;
@@ -535,23 +540,29 @@ unsigned char sudoku_solve(unsigned char start_sudoku[82], unsigned char end_sud
 		new_gaps = count_gaps(master_possibilities);
 		new_poss_count = count_possibilties(master_possibilities);
 		iterations += 1;
-		//printf("After Iteration %d, %d gaps and %d possibilities remain\n", iterations, new_gaps, new_poss_count);
+		#ifdef PRINT_ALL_OUTPUT
+		printf("After Iteration %d, %d gaps and %d possibilities remain\n", iterations, new_gaps, new_poss_count);
+		#endif
 	} while (((new_gaps != old_gaps) || (new_poss_count != old_poss_count)) && (new_gaps != 0));
 	
-	printf(" and after %d iterations %d gaps remain\n", iterations, new_gaps);
-
-	// printf("\nSolver Complete - ");
+	#ifdef PRINT_ALL_OUTPUT
+	printf("\n\nSolver Complete - ");
+	#else
+	printf(" and after %2d iterations %2d gaps remain - ", iterations, new_gaps);
+	#endif
 
 	if (new_gaps == 0) {
-		printf("Sudoku Complete!!\n");
+		printf("Sudoku Complete!!");
 	}
 	else {
 		printf("Sudoku Incomplete!! - %d gaps remain\n", new_gaps);
 	}
-
-	//printf("\nFinished sudoku:\n");
-	//sudoku_print(end_sudoku);
-	//printf("\n");
+	
+	#ifdef PRINT_ALL_OUTPUT
+	printf("\nFinished sudoku:\n");
+	sudoku_print(end_sudoku);
+	printf("\n");
+	#endif
 
 	if(sudoku_verify(end_sudoku)){
 		return 0xFF;

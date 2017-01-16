@@ -6,6 +6,21 @@
 #ifndef SUDOKU_EXAMPLES_H
 #define SUDOKU_EXAMPLES_H
 
+// worlds hardest sudoku
+static unsigned char worlds_hardest[82] = {
+	8,0,0,	0,0,0,	0,0,0,
+	0,0,3,	6,0,0,	0,0,0,
+	0,7,0,	0,9,0,	2,0,0,
+	
+	0,5,0, 	0,0,7,	0,0,0,
+	0,0,0,	0,4,5,	7,0,0,
+	0,0,0,	1,0,0,	0,3,0,
+	
+	0,0,1,	0,0,0,	0,6,8,
+	0,0,8,	5,0,0,	0,1,0,
+	0,9,0,	0,0,0,	4,0,0,
+};
+
 // very tricky sudoku from http://www.7sudoku.com/very-difficult
 static unsigned char very_difficult[82] = {
   0,2,5,  3,6,4,  0,0,0,
