@@ -24,12 +24,14 @@ unsigned char is_num(unsigned char data[10], unsigned char num) {
 }
 
 // function to find number in 9 element array (row/col/square)
+// search direction defined by argument direction: 0 (default) = forwards, 1 = reverse;
 // 0 if not there, otherwise returns location
-unsigned char where_num(unsigned char data[10], unsigned char num) {
-	unsigned char n;
+unsigned char where_num(unsigned char data[10], unsigned char num, unsigned char direction) {
+	unsigned char n, m;
 	for (n = 0; n < 9; n++) {
-		if (data[n] == num) {
-			return n;
+		m = (direction ? (8 - n) : n);
+		if (data[m] == num) {
+			return m;
 		}
 	}
 	return 0;
@@ -123,7 +125,7 @@ void sudoku_file_print(unsigned char sudoku[82], FILE *output_file) {
 // first array is gap array (1 = gap, 0 = no gap)
 // subsequent arrays are possibilities for each number (0 = not possible, 1 = possible)
 // unsigned char master_possibilities[10][82];
-void build_master_possibilities(unsigned char sudoku[82], unsigned char master_possibilities[10][82]) {
+void build_master_possibilities(unsigned char sudoku[82], unsigned char **master_possibilities) {
 	unsigned char n,m,p;
 	// find gaps
 	for (n = 0; n < 81; n++) {
@@ -136,7 +138,7 @@ void build_master_possibilities(unsigned char sudoku[82], unsigned char master_p
 }
 
 // function to count the remaining gaps
-unsigned char count_gaps(unsigned char master_possibilities[10][82]) {
+unsigned char count_gaps(unsigned char **master_possibilities) {
 	unsigned char n, gaps = 0;
 	for (n = 0; n < 81; n++) {
 		if (master_possibilities[0][n] == 1) {
@@ -147,7 +149,7 @@ unsigned char count_gaps(unsigned char master_possibilities[10][82]) {
 }
 
 // function to count the remaining possibilities
-unsigned int count_possibilties(unsigned char master_possibilities[10][82]){
+unsigned int count_possibilties(unsigned char **master_possibilities){
 	unsigned char n, m, count = 0;
 	for(n = 1; n<=9; n++){
 		for(m = 0; m<81; m++){
@@ -160,7 +162,7 @@ unsigned int count_possibilties(unsigned char master_possibilities[10][82]){
 }
 
 // function to update the master_possibilities array
-void update_master_possibilities(unsigned char sudoku[82], unsigned char master_possibilities[10][82]) {
+void update_master_possibilities(unsigned char sudoku[82], unsigned char **master_possibilities) {
 	unsigned char n,m, square_num, row, col, num, position, row_line_up, col_line_up, opcode, opcode_num;
 	unsigned char position1 = 0, position2 = 0, position3 = 0;
 	unsigned char *data, *possibility_data;
@@ -193,7 +195,7 @@ void update_master_possibilities(unsigned char sudoku[82], unsigned char master_
 				// eliminate possibilities in other squares based on 2 or 3 possibilities lining up in this square
 				possibility_data = extract_square(square_num, master_possibilities[num]);
 				m = is_num(possibility_data, 1);
-				if ((m == 2) | (m == 3)) {
+				if ((m == 2) || (m == 3)) {
 					// where are they
 					position1 = where_num(possibility_data, 1);
 					for (n = 0; n <= 9; n++) {
@@ -212,8 +214,8 @@ void update_master_possibilities(unsigned char sudoku[82], unsigned char master_
 						position3 = position2;
 					}
 					// do the 2 or 3 possibilities line up?
-					row_line_up = ((position1 / 3) == (position2 / 3)) & ((position2 / 3) == (position3 / 3));
-					col_line_up = ((position1 % 3) == (position2 % 3))&((position2 % 3) == (position3 % 3));
+					row_line_up = ((position1 / 3) == (position2 / 3)) && ((position2 / 3) == (position3 / 3));
+					col_line_up = ((position1 % 3) == (position2 % 3)) && ((position2 % 3) == (position3 % 3));
 					if (row_line_up) {
 						row = (position1 / 3) + (square_num / 3) * 3;
 						for (n = 0; n < 9; n++) {
@@ -245,7 +247,7 @@ void update_master_possibilities(unsigned char sudoku[82], unsigned char master_
 }
 
 // fuction including some radical update methods
-void extreme_update(unsigned char sudoku[82], unsigned char master_possibilities[10][82]) {
+void extreme_update(unsigned char sudoku[82], unsigned char **master_possibilities) {
 	unsigned char n, m, square, row, col, p, q, position, num;
 	unsigned char count = 0, row_count = 0, col_count = 0, zero_count = 0;
 	unsigned char *temp_data;
@@ -290,7 +292,7 @@ void extreme_update(unsigned char sudoku[82], unsigned char master_possibilities
 							row_count++;
 							if (row_count == 2) {
 								squares[2] = 0;
-								while ((squares[2] == squares[0]) | (squares[2] == squares[1])) {
+								while ((squares[2] == squares[0]) || (squares[2] == squares[1])) {
 									squares[2] ++;
 								}
 								for (q = 0; q < 9; q++) {
@@ -340,7 +342,7 @@ void extreme_update(unsigned char sudoku[82], unsigned char master_possibilities
 							col_count++;
 							if (col_count == 2) {
 								squares[2] = 0;
-								while ((squares[2] == squares[0]) | (squares[2] == squares[1])) {
+								while ((squares[2] == squares[0]) || (squares[2] == squares[1])) {
 									squares[2] ++;
 								}
 								for (q = 0; q < 9; q++) {
@@ -360,7 +362,7 @@ void extreme_update(unsigned char sudoku[82], unsigned char master_possibilities
 }
 
 // function to test some more methods for extreme_update
-void extreme_test(unsigned char sudoku[82], unsigned char master_possibilities[10][82]) {
+void extreme_test(unsigned char sudoku[82], unsigned char **master_possibilities) {
 	/*** IF x (2 OR MORE) NUMBERS SHARE THE SAME x POSSIBILITIES THEN NO OTHER NUMBER CAN BE PUT IN THESE POSSIBILITIES ***/
 	// this happens for numbers 3 and 8 in square 3 of the challenging metro sudoku
 	unsigned char square, num, n, m, p, match, position;
@@ -405,7 +407,7 @@ void extreme_test(unsigned char sudoku[82], unsigned char master_possibilities[1
 						}
 						// remove these as possibilities for other numbers
 						for (num = 1; num <= 9; num++) {
-							if ((num != two_poss[n]) & (num != two_poss[n + m])) {
+							if ((num != two_poss[n]) && (num != two_poss[n + m])) {
 								// position = square starting col + square starting row + current row + current col
 								position = ((square % 3) * 3) + ((square / 3) * 27) + ((locations[0] / 3) * 9) + (locations[0] % 3);
 								master_possibilities[num][position] = 0;
@@ -423,7 +425,7 @@ void extreme_test(unsigned char sudoku[82], unsigned char master_possibilities[1
 }
 
 // function to fill in a sudoku number and remove from master_possibility array
-void enter_number(unsigned char num, unsigned char position, unsigned char sudoku[82], unsigned char master_possibilities[10][82]) {
+void enter_number(unsigned char num, unsigned char position, unsigned char sudoku[82], unsigned char **master_possibilities) {
 	unsigned char n;
 	// fill in sudoku
 	sudoku[position] = num;
@@ -434,7 +436,7 @@ void enter_number(unsigned char num, unsigned char position, unsigned char sudok
 }
 
 // function to find all places numbers can go and enter them into sudoku
-void possibility_solve(unsigned char sudoku[82], unsigned char master_possibilities[10][82]) {
+void possibility_solve(unsigned char sudoku[82], unsigned char **master_possibilities) {
 	unsigned char opcode_num, n, num, position, possibilities, opcode;
 	unsigned char *data;
 	// define a function array for the extract functions
@@ -489,7 +491,7 @@ void possibility_solve(unsigned char sudoku[82], unsigned char master_possibilit
 }
 
 // function to verify solver return 0 = correct, 1 = incorrect
-void sudoku_verify(unsigned char sudoku[82]) {
+unsigned char sudoku_verify(unsigned char sudoku[82]) {
 	unsigned char num, n, opcode;
 	// define a function array for the extract functions
 	unsigned char* (*extract[3])(unsigned char, unsigned char [82]) = {&extract_square, &extract_row, &extract_col};
@@ -499,30 +501,35 @@ void sudoku_verify(unsigned char sudoku[82]) {
 			// check rows
 			for (n = 0; n < 9; n++) {
 				if (is_num((*extract[opcode])(n, sudoku), num) > 1) {
-					printf("\nError!! - More than one %d in %s %d\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n);
+					printf("Error!! - More than one %d in %s %d\n", num, (opcode ? ((opcode == 1) ? "row" : "col") : "square"), n);
+					return 1;
 				}
 			}
 		}
 	}
+	return 0;
 }
 
 // function to solve sudoku
-// returns 0 if solved otherwise returns number of gaps
-unsigned char sudoku_solve(unsigned char start_sudoku[82], unsigned char end_sudoku[82], unsigned char master_possibilities[10][82]) {
+// returns 0 if solved otherwise returns number of gaps or if no gaps but incorrect returns 0xFF
+unsigned char sudoku_solve(unsigned char start_sudoku[82], unsigned char end_sudoku[82], unsigned char **master_possibilities) {
 	unsigned int old_poss_count, new_poss_count,n;
 	unsigned char iterations = 0, old_gaps = 0, new_gaps = 0;
-	unsigned char possibility_matrix[10][82];
-	
+		
 	for(n = 0; n < 81; n++){
 		end_sudoku[n] = start_sudoku[n];
 	}
 
-	build_master_possibilities(end_sudoku, master_possibilities);
 	new_poss_count = count_possibilties(master_possibilities);
 	new_gaps = count_gaps(master_possibilities);
+	#ifdef PRINT_ALL_OUTPUT
 	printf("Starting sudoku:\n");
 	sudoku_print(end_sudoku);
-	printf("\nStarting gaps = %d\n\n", new_gaps);
+	#endif
+	printf("Starting gaps = %d", new_gaps);
+	#ifdef PRINT_ALL_OUPUT
+	printf("\n\n");
+	#endif
 	do{
 		old_gaps = new_gaps;
 		old_poss_count = new_poss_count;
@@ -530,27 +537,36 @@ unsigned char sudoku_solve(unsigned char start_sudoku[82], unsigned char end_sud
 		extreme_update(end_sudoku, master_possibilities);
 		extreme_test(end_sudoku, master_possibilities);
 		possibility_solve(end_sudoku, master_possibilities);
-		
 		new_gaps = count_gaps(master_possibilities);
 		new_poss_count = count_possibilties(master_possibilities);
 		iterations += 1;
+		#ifdef PRINT_ALL_OUTPUT
 		printf("After Iteration %d, %d gaps and %d possibilities remain\n", iterations, new_gaps, new_poss_count);
-	} while (((new_gaps != old_gaps)|(new_poss_count != old_poss_count)) && (new_gaps != 0));
-
-	printf("\nSolver Complete - ");
+		#endif
+	} while (((new_gaps != old_gaps) || (new_poss_count != old_poss_count)) && (new_gaps != 0));
+	
+	#ifdef PRINT_ALL_OUTPUT
+	printf("\n\nSolver Complete - ");
+	#else
+	printf(" and after %2d iterations %2d gaps remain - ", iterations, new_gaps);
+	#endif
 
 	if (new_gaps == 0) {
-		printf("Sudoku Complete!!\n");
+		printf("Sudoku Complete!!");
 	}
 	else {
 		printf("Sudoku Incomplete!! - %d gaps remain\n", new_gaps);
 	}
-
+	
+	#ifdef PRINT_ALL_OUTPUT
 	printf("\nFinished sudoku:\n");
 	sudoku_print(end_sudoku);
 	printf("\n");
+	#endif
 
-	sudoku_verify(end_sudoku);
+	if(sudoku_verify(end_sudoku)){
+		return 0xFF;
+	}
 
 	return new_gaps;
 }

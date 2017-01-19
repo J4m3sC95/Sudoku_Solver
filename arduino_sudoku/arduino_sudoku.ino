@@ -25,12 +25,15 @@ static unsigned char my_sudoku[82] = {
 #define SUDOKU_TO_SOLVE my_sudoku
 
 unsigned char master_possibilities[10][82];
+unsigned char *master_possibilities_ptr[] = {master_possibilities[0], master_possibilities[1], master_possibilities[2], master_possibilities[3],
+master_possibilities[4],master_possibilities[5], master_possibilities[6], master_possibilities[7], master_possibilities[8], master_possibilities[9]
+};
 
 void setup() {
   Serial.begin(9600);
   // put your setup code here, to run once:
   unsigned long time = millis();
-  sudoku_solve(SUDOKU_TO_SOLVE, SUDOKU_TO_SOLVE, master_possibilities);
+  sudoku_solve(SUDOKU_TO_SOLVE, SUDOKU_TO_SOLVE, master_possibilities_ptr);
   time = millis() - time;
   Serial.print("Run time = ");
   Serial.print(time);

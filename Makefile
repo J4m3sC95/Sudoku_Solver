@@ -9,6 +9,14 @@ default:
 	@echo "- clean:\tremoves any built files\n"
 
 all: sudoku_gtk sudoku_cmd
+	chmod 644 arduino_sudoku/sudoku.cpp
+	chmod 644 arduino_sudoku/sudoku.h
+	cp sudoku.cpp arduino_sudoku/sudoku.cpp
+	cp sudoku.h arduino_sudoku/sudoku.h
+	chmod 444 arduino_sudoku/sudoku.cpp
+	chmod 444 arduino_sudoku/sudoku.h
+	cp sudoku_cmd ~/bin/sudoku_cmd
+	cp sudoku_gtk ~/bin/sudoku_gtk
 
 sudoku_gtk: sudoku.o sudoku_tande.o main_gtk.cpp
 	$(CC) -o $@ sudoku.o sudoku_tande.o main_gtk.cpp $(CFLAGS) `pkg-config --libs --cflags gtk+-2.0` 
