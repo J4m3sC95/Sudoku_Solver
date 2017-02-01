@@ -1,0 +1,13 @@
+﻿Build started 01/02/2017 21:24:31.
+     1>Project "E:\__CODE\Sudoku_Solver\trunk\windows\Sudoku_Solver\Sudoku_Solver\Sudoku_Solver.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\\" /AI"C:\Program Files (x86)\Windows Kits\8.1\References\CommonConfiguration\Neutral" /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\Facades\\" /Zi /clr /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\mscorlib.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Data.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Drawing.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Windows.Forms.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Xml.dll" /analyze- /errorReport:prompt /clr:nostdlib MyForm.cpp
+         MyForm.cpp
+     1>e:\__code\sudoku_solver\trunk\windows\sudoku_solver\sudoku_solver\MyForm.h(114): error C2065: 'string': undeclared identifier
+     1>e:\__code\sudoku_solver\trunk\windows\sudoku_solver\sudoku_solver\MyForm.h(114): error C2146: syntax error: missing ';' before identifier 'text'
+     1>e:\__code\sudoku_solver\trunk\windows\sudoku_solver\sudoku_solver\MyForm.h(114): error C2065: 'text': undeclared identifier
+     1>Done Building Project "E:\__CODE\Sudoku_Solver\trunk\windows\Sudoku_Solver\Sudoku_Solver\Sudoku_Solver.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:00.55
